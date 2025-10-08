@@ -15,7 +15,7 @@
 #include <netinet/in.h>
 #endif
 
-const std::string VERSION = "tcp 0.2.1";
+const std::string VERSION = "ttcp 0.2.1";
 const size_t MAX_MESSAGE_BUFFER_SIZE = 4096;
 
 struct cross_platform_socket {
@@ -42,7 +42,7 @@ std::string get_config_path() {
 #ifdef _WIN32
     if (!home) home = getenv("USERPROFILE");
 #endif
-    std::string path = std::string(home) + "/.config/tcp/config.toml";
+    std::string path = std::string(home) + "/.config/ttcp/config.toml";
     std::filesystem::create_directories(std::filesystem::path(path).parent_path());
     return path;
 }
@@ -61,7 +61,7 @@ int get_port_from_config() {
         }
     } else {
         std::ofstream out(path);
-        out << "# tcp config\nport = " << port << "\n";
+        out << "# ttcp config\nport = " << port << "\n";
     }
     return port;
 }
@@ -69,16 +69,16 @@ int get_port_from_config() {
 void print_help() {
     std::cout <<
     "Usage:\n"
-    "  tcp server [--port <num>]\n"
-    "  tcp client <ip> [message|file] [--port <num>]\n\n"
+    "  ttcp server [--port <num>]\n"
+    "  ttcp client <ip> [message|file] [--port <num>]\n\n"
     "Options:\n"
     "  --help        Show this help message\n"
     "  --version     Show version info\n"
     "  --port <num>  Override port (default from config)\n"
-    "\nConfig file: ~/.config/tcp/config.toml\n";
+    "\nConfig file: ~/.config/ttcp/config.toml\n";
 }
 
-void run_tcp_server(int port) {
+void run_ttcp_server(int port) {
     cross_platform_socket::socket_type server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket < 0) { perror("socket() failed"); return; }
 
@@ -116,7 +116,7 @@ void run_tcp_server(int port) {
     cross_platform_socket::close_socket(server_socket);
 }
 
-void run_tcp_client(const std::string& server_ip, int port, const std::string& msg) {
+void run_ttcp_client(const std::string& server_ip, int port, const std::string& msg) {
     cross_platform_socket::socket_type client_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (client_socket < 0) { perror("socket() failed"); return; }
 
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
     cross_platform_socket::initialize();
 
     if (is_server) {
-        run_tcp_server(port);
+        run_ttcp_server(port);
     } else {
         if (argc < 3) { std::cerr << "Client requires SERVER_IP argument\n"; return 1; }
         std::string server_ip = argv[2];
@@ -169,7 +169,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        run_tcp_client(server_ip, port, msg);
+        run_ttcp_client(server_ip, port, msg);
     }
 
     cross_platform_socket::cleanup();
