@@ -19,16 +19,6 @@
       url = "https://github.com/danielbarter/mini_compile_commands/archive/${lock.nodes.miniCompileCommands.locked.rev}.tar.gz";
       sha256 = lock.nodes.miniCompileCommands.locked.narHash;
     },
-  # Custom nixpkgs channel, owner's nickname is kotur, hence kotur-nixpkgs
-  kotur-nixpkgs ? let
-    koturPkgs = fetchTarball {
-      url = "https://github.com/nkoturovic/kotur-nixpkgs/archive/${lock.nodes.koturNixPkgs.locked.rev}.tar.gz";
-      sha256 = lock.nodes.koturNixPkgs.locked.narHash;
-    };
-  in
-    import koturPkgs {
-      inherit system;
-    },
 }: let
   # Using mini_compile_commands to export compile_commands.json
   # https://github.com/danielbarter/mini_compile_commands/
@@ -119,16 +109,9 @@
       package
     ];
 
-    # Shell (dev environment) specific packages
-    packages = with pkgs; [
-      kotur-nixpkgs.dinosay # packet loads from the custom nixpkgs (kotur-nixpkgs)
-    ];
-
     # Hook used for modifying the prompt look and printing the welcome message
     shellHook = ''
-      PS1="\[\e[32m\][\[\e[m\]\[\e[33m\]nix-shell\\[\e[m\]:\[\e[36m\]\w\[\e[m\]\[\e[32m\]]\[\e[m\]\\$\[\e[m\] "
-      alias ll="ls -l"
-      dinosay -r -b happy -w 60 "Welcome to the '${package.name}' dev environment!"
+      echo -e "\033[0;32m[  OK  ]\033[0m Entered dev shell."
     '';
   };
 in
