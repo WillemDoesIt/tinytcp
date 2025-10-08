@@ -1,5 +1,5 @@
 # TinyTCP
-Version: 0.1.0
+Version: 0.2.0
 
 > [!WARNING]
 > This project is in early stages. Functionality is available, but use at your own risk.  

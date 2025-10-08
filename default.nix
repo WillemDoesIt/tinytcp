@@ -45,7 +45,7 @@
   # mkDerivation is the main function used to build packages with the Stdenv
   package = mcc-env.mkDerivation (self: {
     name = "ttcp";
-    version = "0.0.3";
+    version = "0.2.0";
 
     # Programs and libraries used/available at build-time
     nativeBuildInputs = with pkgs; [
