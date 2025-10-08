@@ -15,7 +15,7 @@
 #include <netinet/in.h>
 #endif
 
-const std::string VERSION = "tcp 0.2.0";
+const std::string VERSION = "tcp 0.2.1";
 const size_t MAX_MESSAGE_BUFFER_SIZE = 4096;
 
 struct cross_platform_socket {
