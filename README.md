@@ -1,6 +1,9 @@
 # TinyTCP
+Version: 0.0.1
+
 > [!WARNING]
 > This project is in early stages and is not yet functional.
+> There will be a release branch once working.
 
 This is a very lightweight simple cross platform package to both listen on a port and to recive messages on that port.
 
