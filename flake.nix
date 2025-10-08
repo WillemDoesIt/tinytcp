@@ -1,18 +1,25 @@
 {
-  inputs = { nixpkgs.url = "github:nixos/nixpkgs"; };
-  outputs = { self, nixpkgs }:
-  let 
-    system = "x86_64-linux";
-    pkgs = nixpkgs.legacyPackages.${system};
-  in {
-    devShell.${system} = pkgs.mkShell { 
-      nativeBuildInputs = with pkgs; [ 
-        gcc
-      ];
-
-      shellHook = ''
-        echo -e "\033[0;32m[  OK  ]\033[0m Entered dev shell."
-      '';
-    };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs.miniCompileCommands = {
+    url = github:danielbarter/mini_compile_commands/v0.6;
+    flake = false;
   };
+  inputs.koturNixPkgs = {
+    url = github:nkoturovic/kotur-nixpkgs/v0.8.0;
+    flake = false;
+  };
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+      package = import ./default.nix {inherit system pkgs;};
+    in {
+      packages.ttcp = package;
+      devShells.default = package.shell;
+      formatter = pkgs.alejandra;
+    });
 }
