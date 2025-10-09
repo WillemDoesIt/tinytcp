@@ -10,9 +10,9 @@ It allows listening on a TCP port and sending/receiving messages on that port.
 
 ---
 
-# User Install
-## Windows
+# User Install (Windows)
 Go to Rlease, and download the `ttcp-setup.exe` and run it.
+The Prject is yet to be added to any package managers and thus is not on other Operating Systems.
 
 ---
 
@@ -26,7 +26,7 @@ Go to Rlease, and download the `ttcp-setup.exe` and run it.
 ./bin/ttcp client 127.0.0.1 "hello world"
 ```
 
---
+---
 
 ## Manual build and Install with Nix
 For developers who want to compile the code form it's source and optionally install it systemwide. Nix can be used on any Unix system, WSL2, macOS, and Linux.
