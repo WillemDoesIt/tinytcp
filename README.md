@@ -10,20 +10,29 @@ It allows listening on a TCP port and sending/receiving messages on that port.
 
 ---
 
-## Features
-
-- Minimal TCP server and client
-- Cross-platform (Linux/macOS/Windows via Nix)
-- Reproducible builds via Nix flakes
-- Executable: `ttcp`
+# User Install
+## Windows
+Go to Rlease, and download the `ttcp-setup.exe` and run it.
 
 ---
 
-## Installation & Usage (Unix / Linux / macOS)
-
-### Option 1: Using Nix Flake
+## 🧪 Example Usage
 
 ```bash
+# Start server
+./bin/ttcp server
+
+# From another terminal or host
+./bin/ttcp client 127.0.0.1 "hello world"
+```
+
+--
+
+## Manual build and Install with Nix
+For developers who want to compile the code form it's source and optionally install it systemwide. Nix can be used on any Unix system, WSL2, macOS, and Linux.
+
+```bash
+# Clone repository
 git clone git@github.com:WillemDoesIt/tinytcp.git
 cd tinytcp
 
@@ -31,24 +40,101 @@ cd tinytcp
 nix build .#ttcp
 
 # Run directly
-./result/bin/ttcp server
-./result/bin/ttcp client 127.0.0.1
+./result/bin/ttcp --help
+
+# Install and uninstall commands
+nix profile install .#ttcp
+nix profile remove ttcp 
 ````
 
-To install into your user profile (global executable):
-
-```bash
-nix profile install .#ttcp
-ttcp server       # run from anywhere
-ttcp client 127.0.0.1
-nix profile remove ttcp  # uninstall cleanly
-```
-
-### Option 2: Using Deploy Script
+### Compile and run as developer with Nix
 
 ```bash
 nix develop
 chmod +x deploy.sh
-./deploy.sh server
-./deploy.sh client 127.0.0.1
+
+./deploy.sh --help
+```
+
+### Linux Developer test Windows .exe (Optional)
+
+```bash
+nix-shell -p pkgsCross.mingwW64.buildPackages.gcc wine
+x86_64-w64-mingw32-g++ -static -o bin/ttcp.exe src/*.cpp -lws2_32
+
+wine bin/ttcp.exe --help
+
+# Make installer
+makensis make_win_install.nsi
+```
+
+---
+
+## Manual Build (Non-Nix)
+
+These instructions allow developers to compile and run TinyTCP without Nix, using standard OS tooling.
+
+### Windows (clang via winget)
+
+```powershell
+# Install clang
+winget install llvm
+
+# Navigate to project
+cd path\to\tinytcp
+
+# Compile
+clang++ src\main.cpp -o bin\ttcp.exe -std=c++20 -lws2_32
+
+# Run
+.\bin\ttcp.exe --help
+```
+
+### macOS (clang from Xcode CLT)
+
+```bash
+# Install Xcode Command Line Tools if missing
+xcode-select --install
+
+# Navigate to project
+cd /path/to/tinytcp
+
+# Compile
+clang++ src/main.cpp -o bin/ttcp -std=c++20
+
+# Run
+./bin/ttcp --help
+```
+
+### Linux
+
+#### Debian / Ubuntu
+
+```bash
+sudo apt update
+sudo apt install -y g++
+
+cd /path/to/tinytcp
+g++ src/main.cpp -o bin/ttcp -std=c++20
+./bin/ttcp --help
+```
+
+#### Fedora
+
+```bash
+sudo dnf install -y gcc-c++
+
+cd /path/to/tinytcp
+g++ src/main.cpp -o bin/ttcp -std=c++20
+./bin/ttcp --help
+```
+
+#### Arch / Manjaro
+
+```bash
+sudo pacman -S --needed base-devel
+
+cd /path/to/tinytcp
+g++ src/main.cpp -o bin/ttcp -std=c++20
+./bin/ttcp --help
 ```
