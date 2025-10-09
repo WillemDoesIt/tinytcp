@@ -11,7 +11,7 @@ It allows listening on a TCP port and sending/receiving messages on that port.
 ---
 
 # User Install
-(Click here)[https://github.com/WillemDoesIt/tinytcp/releases/latest] for the download page of the latest pre-release
+[Click here](https://github.com/WillemDoesIt/tinytcp/releases/latest) for the download page of the latest pre-release
 
 ---
 
