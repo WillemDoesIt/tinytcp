@@ -76,11 +76,12 @@ These instructions allow developers to compile and run TinyTCP without Nix, usin
 ### Windows (clang via winget)
 
 ```powershell
+# Clone respository
+git clone git@github.com:WillemDoesIt/tinytcp.git
+cd tinytcp
+
 # Install clang
 winget install llvm
-
-# Navigate to project
-cd path\to\tinytcp
 
 # Compile
 clang++ src\main.cpp -o bin\ttcp.exe -std=c++20 -lws2_32
@@ -92,11 +93,12 @@ clang++ src\main.cpp -o bin\ttcp.exe -std=c++20 -lws2_32
 ### macOS (clang from Xcode CLT)
 
 ```bash
+# Clone respository
+git clone git@github.com:WillemDoesIt/tinytcp.git
+cd tinytcp
+
 # Install Xcode Command Line Tools if missing
 xcode-select --install
-
-# Navigate to project
-cd /path/to/tinytcp
 
 # Compile
 clang++ src/main.cpp -o bin/ttcp -std=c++20
@@ -106,34 +108,33 @@ clang++ src/main.cpp -o bin/ttcp -std=c++20
 ```
 
 ### Linux
+```
+# Clone respository
+git clone git@github.com:WillemDoesIt/tinytcp.git
+cd tinytcp
+
+# Run the code
+chmod +x deploy.sh
+./deploy.sh --help
+```
+
+If you don't have g++ installed, do the following first
 
 #### Debian / Ubuntu
 
 ```bash
 sudo apt update
 sudo apt install -y g++
-
-cd /path/to/tinytcp
-g++ src/main.cpp -o bin/ttcp -std=c++20
-./bin/ttcp --help
 ```
 
 #### Fedora
 
 ```bash
 sudo dnf install -y gcc-c++
-
-cd /path/to/tinytcp
-g++ src/main.cpp -o bin/ttcp -std=c++20
-./bin/ttcp --help
 ```
 
-#### Arch / Manjaro
+#### Arch
 
 ```bash
 sudo pacman -S --needed base-devel
-
-cd /path/to/tinytcp
-g++ src/main.cpp -o bin/ttcp -std=c++20
-./bin/ttcp --help
 ```
