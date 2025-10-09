@@ -20,10 +20,10 @@ The Project is yet to be added to any package managers and thus is not on other 
 
 ```bash
 # Start server
-./bin/ttcp server
+ttcp server
 
 # From another terminal or host
-./bin/ttcp client 127.0.0.1 "hello world"
+ttcp client 127.0.0.1 "hello world"
 ```
 
 ---
