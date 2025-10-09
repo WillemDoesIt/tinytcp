@@ -10,9 +10,8 @@ It allows listening on a TCP port and sending/receiving messages on that port.
 
 ---
 
-# User Install (Windows)
-Go to Rlease, and download the `ttcp-setup.exe` and run it.
-The Project is yet to be added to any package managers and thus is not on other Operating Systems.
+# User Install
+(Click here)[https://github.com/WillemDoesIt/tinytcp/releases/latest] for the download page of the latest pre-release
 
 ---
 
