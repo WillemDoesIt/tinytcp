@@ -12,7 +12,7 @@ It allows listening on a TCP port and sending/receiving messages on that port.
 
 # User Install (Windows)
 Go to Rlease, and download the `ttcp-setup.exe` and run it.
-The Prject is yet to be added to any package managers and thus is not on other Operating Systems.
+The Project is yet to be added to any package managers and thus is not on other Operating Systems.
 
 ---
 
