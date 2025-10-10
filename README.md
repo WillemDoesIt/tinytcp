@@ -1,5 +1,5 @@
 # TinyTCP
-Version: 0.2.1
+Version: 0.3.0-alpha
 
 > [!WARNING]
 > This project is in early stages. Functionality is available, but use at your own risk.  
@@ -11,14 +11,16 @@ It allows listening on a TCP port and sending/receiving messages on that port.
 # User Install
 [Click here](https://github.com/WillemDoesIt/tinytcp/releases/latest) for the download page of the latest pre-release
 
-## 🧪 Example Usage
+## Example Usage
 
 ```bash
-# Start server
+# Start server, listening on default port
 ttcp server
+ttcp server --port 9001 # custom port 9001
 
 # From another terminal or host
-ttcp client 127.0.0.1 "hello world"
+ttcp client 127.0.0.1 # send to self
+ttcp client 10.10.10.10 --message "Hello Server!" --port 9001 # send "Hello Server!" to 10.10.10.10:9001 
 ```
 
 ## Manual build and Install with Nix

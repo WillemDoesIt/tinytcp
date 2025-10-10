@@ -22,13 +22,13 @@
 
         package = mcc-env.mkDerivation (self: {
           pname = "ttcp";
-          version = "0.2.1";
+          version = "0.3.0-alpha";
           src = builtins.path {
             path = ./.;
             filter = path: type: !(pkgs.lib.hasPrefix "." (baseNameOf path));
           };
           nativeBuildInputs = with pkgs; [ mcc-hook ncurses cmake gnumake ];
-          buildInputs = with pkgs; [ fmt ];
+          buildInputs = with pkgs; [ fmt tomlplusplus catch2 ];
           cmakeFlags = [ "--no-warn-unused-cli" ];
           passthru = { inherit pkgs shell; };
         });
