@@ -8,12 +8,8 @@ Version: 0.2.1
 TinyTCP is a lightweight, cross-platform TCP client/server utility.  
 It allows listening on a TCP port and sending/receiving messages on that port.  
 
----
-
 # User Install
 [Click here](https://github.com/WillemDoesIt/tinytcp/releases/latest) for the download page of the latest pre-release
-
----
 
 ## 🧪 Example Usage
 
@@ -24,8 +20,6 @@ ttcp server
 # From another terminal or host
 ttcp client 127.0.0.1 "hello world"
 ```
-
----
 
 ## Manual build and Install with Nix
 For developers who want to compile the code form it's source and optionally install it systemwide. Nix can be used on any Unix system, WSL2, macOS, and Linux.
@@ -41,100 +35,48 @@ nix build .#ttcp
 # Run directly
 ./result/bin/ttcp --help
 
-# Install and uninstall commands
+# Install and uninstall commands (makes `ttcp` a command)
 nix profile install .#ttcp
 nix profile remove ttcp 
 ````
 
-### Compile and run as developer with Nix
+### Easy Compile and Run with Nix
 
 ```bash
-nix develop
 chmod +x deploy.sh
 
+# Enter shell
+nix develop
+
 ./deploy.sh --help
+
+# Exit shell
+exit
 ```
 
-### Linux Developer test Windows .exe (Optional)
+## Manual Build (Non-Nix)
 
 ```bash
-nix-shell -p pkgsCross.mingwW64.buildPackages.gcc wine
-x86_64-w64-mingw32-g++ -static -o bin/ttcp.exe src/*.cpp -lws2_32
+# Clone in preferred dierectory
+git clone git@github.com:WillemDoesIt/tinytcp.git
+cd tinytcp
 
-wine bin/ttcp.exe --help
+# Compile + run
+./deploy.sh
+```
+> [!NOTE]
+> Dependency is a C++ compiler (`clang++` or `g++`).
+> Windows: install with `winget install llvm`, 
+> MacOS: `xcode-select --install`
+
+
+## Make Windows installer
+```bash
+# Create executable (works on linux and windows)
+x86_64-w64-mingw32-g++ -static -o bin/ttcp.exe src/*.cpp -lws2_32
 
 # Make installer
 makensis make_win_install.nsi
 ```
-
----
-
-## Manual Build (Non-Nix)
-
-These instructions allow developers to compile and run TinyTCP without Nix, using standard OS tooling.
-
-### Windows (clang via winget)
-
-```powershell
-# Clone respository
-git clone git@github.com:WillemDoesIt/tinytcp.git
-cd tinytcp
-
-# Install clang
-winget install llvm
-
-# Compile
-clang++ src\main.cpp -o bin\ttcp.exe -std=c++20 -lws2_32
-
-# Run
-.\bin\ttcp.exe --help
-```
-
-### macOS (clang from Xcode CLT)
-
-```bash
-# Clone respository
-git clone git@github.com:WillemDoesIt/tinytcp.git
-cd tinytcp
-
-# Install Xcode Command Line Tools if missing
-xcode-select --install
-
-# Compile
-clang++ src/main.cpp -o bin/ttcp -std=c++20
-
-# Run
-./bin/ttcp --help
-```
-
-### Linux
-```
-# Clone respository
-git clone git@github.com:WillemDoesIt/tinytcp.git
-cd tinytcp
-
-# Run the code
-chmod +x deploy.sh
-./deploy.sh --help
-```
-
-If you don't have g++ installed, do the following first
-
-#### Debian / Ubuntu
-
-```bash
-sudo apt update
-sudo apt install -y g++
-```
-
-#### Fedora
-
-```bash
-sudo dnf install -y gcc-c++
-```
-
-#### Arch
-
-```bash
-sudo pacman -S --needed base-devel
-```
+> [!NOTE]
+> Nix: `nix-shell -p pkgsCross.mingwW64.buildPackages.gcc nsis`
