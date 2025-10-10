@@ -80,5 +80,7 @@ void send_message(const std::string& server_ip, int port, const std::string& msg
     if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) { perror("connect() failed"); return; }
 
     send(sock, msg.c_str(), msg.size(), 0);
+    shutdown(sock, SHUT_WR);  // <- add this line
     cross_platform_socket::close_socket(sock);
+
 }
