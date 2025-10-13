@@ -29,5 +29,7 @@ void print_help() {
     "  -h --help        Show this help message\n"
     "  -v --version     Show version info\n"
     "  --port <num>     Override port (default from config)\n"
-    "  --message <msg>  Override default message\n";
+    "  --message <msg>  Override default message\n"
+    "\n"
+    "[!] Note: If listening stalls, your firewall or network may be blocking the port.";
 }

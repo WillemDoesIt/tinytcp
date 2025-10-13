@@ -4,7 +4,7 @@
 #include "network.hpp"
 #include "cli.hpp"
 
-const std::string VERSION = "0.3.0-alpha";
+const std::string VERSION = "0.3.1-alpha";
 const std::string PKG = "ttcp";
 
 int main(int argc, char** argv) {

@@ -22,7 +22,7 @@
 
         package = mcc-env.mkDerivation (self: {
           pname = "ttcp";
-          version = "0.3.0-alpha";
+          version = "0.3.1-alpha";
           src = builtins.path {
             path = ./.;
             filter = path: type: !(pkgs.lib.hasPrefix "." (baseNameOf path));
