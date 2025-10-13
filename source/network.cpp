@@ -37,8 +37,16 @@ void start_server(int port) {
     int reuse = 1;
     setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 
-    if (bind(server_socket, (sockaddr*)&addr, sizeof(addr)) < 0) { perror("bind() failed"); return; }
-    if (listen(server_socket, 1) < 0) { perror("listen() failed"); return; }
+    if (bind(server_socket, (sockaddr*)&addr, sizeof(addr)) < 0) {
+        if (errno == EACCES)
+            std::cerr << "[!] Port " << port << " blocked by firewall or requires elevated privileges.\n";
+        else if (errno == EADDRINUSE)
+            std::cerr << "[!] Port " << port << " already in use.\n";
+        else
+            perror("bind() failed");
+        return;
+    }
+    if (listen(server_socket, 10) < 0) { perror("listen() failed"); return; }
 
     std::cout << "Server listening on TCP port " << port << "...\n";
 
@@ -77,7 +85,16 @@ void send_message(const std::string& server_ip, int port, const std::string& msg
     inet_pton(AF_INET, server_ip.c_str(), &addr.sin_addr);
 #endif
 
-    if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) { perror("connect() failed"); return; }
+    if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
+        if (errno == EACCES)
+            std::cerr << "[!] Cannot connect to " << server_ip << ":" << port << " (blocked by firewall?)\n";
+        else if (errno == ECONNREFUSED)
+            std::cerr << "[!] Connection refused by " << server_ip << ":" << port << "\n";
+        else
+            perror("connect() failed");
+        cross_platform_socket::close_socket(sock);
+        return;
+    }
 
     send(sock, msg.c_str(), msg.size(), 0);
     shutdown(sock, SHUT_WR);  // <- add this line

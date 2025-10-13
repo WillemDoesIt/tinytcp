@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include "config.hpp"
 #include "network.hpp"
 #include "cli.hpp"
@@ -14,7 +15,7 @@ int main(int argc, char** argv) {
     if (args.help) { print_help(); return 0; }
     if (args.version) { std::cout << PKG + ": " + VERSION + "\n"; return 0; }
 
-    if (args.server) start_server(args.port);
+    if (args.server) { start_server(args.port); while (true) std::this_thread::sleep_for(std::chrono::hours(24)); }
     else {
         if (args.server_ip.empty()) { 
             std::cerr << "Client requires SERVER_IP argument\n"; 

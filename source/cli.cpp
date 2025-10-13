@@ -12,9 +12,10 @@ Args parse_args(int argc, char** argv, const Config& cfg) {
         if (arg == "--help" || arg == "-h") args.help = true;
         else if (arg == "--version" || arg == "-v") args.version = true;
         else if (arg == "server") args.server = true;
+        else if (arg == "client") args.server = false;
         else if (arg == "--port" && i+1 < argc) args.port = std::stoi(argv[++i]);
         else if (arg == "--message" && i+1 < argc) args.message = argv[++i];
-        else if (!args.server && args.server_ip.empty()) args.server_ip = arg;
+        else if (!args.server_ip.size()) args.server_ip = arg;
     }
     return args;
 }
@@ -25,8 +26,8 @@ void print_help() {
     "  ttcp server [--port <num>]\n"
     "  ttcp client <ip> [--message <msg>] [--port <num>]\n\n"
     "Options:\n"
-    "  --help           Show this help message\n"
-    "  --version        Show version info\n"
+    "  -h --help        Show this help message\n"
+    "  -v --version     Show version info\n"
     "  --port <num>     Override port (default from config)\n"
     "  --message <msg>  Override default message\n";
 }
