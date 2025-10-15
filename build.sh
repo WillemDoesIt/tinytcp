@@ -18,8 +18,3 @@ function safe_runner() {
 
 # Compile step
 safe_runner "c++ -std=c++20 $(find source -name '*.cpp') -Iheaders -I/path/to/tomlplusplus/include -o bin/ttcp" "Compiling C++ project"
-
-# Run step
-echo -e "\033[0;34m[  RUN  ]\033[0m Executing binary"
-./bin/ttcp "$@"
-
