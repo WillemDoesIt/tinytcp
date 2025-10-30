@@ -1,0 +1,12 @@
+InstallDir "$PROGRAMFILES\tinytcp"
+OutFile "build\tinytcp_installer.exe"
+
+Section "Install Tinytcp"
+  SetOutPath "$INSTDIR"
+  File "build\tinytcp.exe"
+
+  ; Add to system PATH
+  ReadRegStr $0 HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path"
+  StrCpy $0 "$0;$INSTDIR"
+  WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "Path" "$0"
+SectionEnd
