@@ -1,47 +1,84 @@
 # TinyTCP
+Version: 0.0.1-alpha
+
+> [!WARNING]
+> This project is in early stages. Functionality is available, but use at your own risk.  
+> A proper release branch will follow once fully tested.
+> Originally intended for a class this has become big enough that I will continue to work on it.
 
 Simple TCP listener/server program. Supports sending a file between client and server.
 
 ---
 
-## Windows Run (MSYS2 + MinGW64)
+## Windows Run (Installer or MSYS2 + MinGW64)
 
-1. **Install MSYS2 via winget:**
+### Option 1 — Installer (Recommended)
+
+1. Run the NSIS installer (`tinytcp-setup.exe`) included in the release.
+2. After installation, **open a new terminal** and run:
+
 ```cmd
-winget install -e --id MSYS2.MSYS2
-````
-
-2. **Run the MinGW64 shell:**
-   Open `C:\msys64\mingw64.exe`.
-
-3. **Update and install C++ compiler:**
-
-```bash
-pacman -Syu    # then close and re-open the mingw64 shell
-pacman -S mingw-w64-x86_64-gcc
+tinytcp server
+tinytcp client <host>
 ```
 
-4. **Navigate to the project directory** and run the program:
+This works **without admin rights** and no additional dependencies.
+
+---
+
+### Option 2 — MSYS2 + MinGW64 (Dev / Testing)
+
+1. **Install MSYS2 via winget:**
+
+```cmd
+winget install -e --id MSYS2.MSYS2
+```
+
+2. Open the **MinGW64 shell** (`C:\msys64\mingw64.exe`).
+3. Update and install the compiler:
+
+```bash
+pacman -Syu    # then close and reopen shell
+pacman -S mingw-w64-x86_64-gcc
+```
+> [!NOTE]
+> Despite pacman being the offical package manager for Arch Linux, this acutally runs in a Windows MSYS2 Shell
+
+4. Navigate to the project directory and run:
 
 ```bash
 cd /c/Users/<you>/path/to/tinytcp
 ./run.bat --help
 ```
+> [!NOTE]
+> Replace path/to/tinytcp
+> `pwd` shows current path, and `whoami` shows current user
 
-5. **Optional debugging with Netcat:**
+5. Optional debugging with Netcat:
 
 ```cmd
 winget install Insecure.Nmap
 "C:\Program Files (x86)\Nmap\nc.exe" localhost 49153
 ```
 
+> `run.bat` compiles all `.cpp` files in `source/`, includes `headers/`, and produces a self-contained `tinytcp.exe`.
+
+6. Optional compiling your own installer:
+
+```cmd
+winget install -e --id NSIS.NSIS
+"C:\Program Files (x86)\NSIS\makensis.exe" path/to/tinytcp/create_install.nsis
+```
+> [!NOTE]
+> Replace path/to/tinytcp
+
 ---
 
 ## macOS / WSL / Linux
 
-### Option 1 — Non-Nix / Native Build
+### Option 1 — Native Build (Non-Nix)
 
-1. Ensure you have a C++ compiler installed:
+1. Make sure you have a C++ compiler:
 
 **macOS:**
 
@@ -56,64 +93,65 @@ sudo apt update
 sudo apt install g++ make
 ```
 
-**Fedora**
+**Fedora:**
 
 ```bash
-sudo dnf install gcc-c++ make       # Fedora
+sudo dnf install gcc-c++ make
 ```
+
 **Arch:**
 
 ```bash
-sudo pacman -S gcc make             # Arch
+sudo pacman -S gcc make
 ```
 
-2. Run the program:
+2. Build and run:
 
 ```bash
-chmod +x run.sh                     # only need to run once
+chmod +x run.sh          # one-time
 ./run.sh --help
 ```
 
-The `build/` folder will contain the compiled executable.
+The compiled executable is placed in `build/`.
 
 ---
 
-### Option 2 — Using Nix (optional)
+### Option 2 — Nix (Optional / Recommended for Iterative Dev)
 
-1. Install Nix if you don't have it:
+1. Install Nix:
 
 ```bash
-sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
+sh <(curl -L https://nixos.org/nix/install) --no-daemon
 ```
+> [!NOTE]
+> Not necessary if already on NixOS
 
-2. Enter a dev shell for faster iterative builds:
+2. Enter a dev shell for fast iterative builds:
 
 ```bash
-nix develop                         # only need to run once per session
-chmod +x run.sh                     # only need to run once
-
+nix develop             # once per session
+chmod +x run.sh         # one-time
 ./run.sh --help
 ```
 
-3. To build and install the package to your profile:
+3. Build and install to your profile:
 
 ```bash
 nix build .#tinytcp
 nix profile install .#tinytcp
 
-# Now you can run it like this
+# Now you can run anywhere:
 tinytcp --help
 
 # To uninstall:
 nix profile remove tinytcp
 ```
 
-> Note: `nix develop` is faster for iterative development because it lets you compile and run without rebuilding a full Nix package.
-
 ---
 
 ## Running Notes
 
-* On all platforms, compiled executables live in `build/`.
+* Compiled executables live in `build/`.
 * `run.sh` / `run.bat` handles compilation automatically.
+* On Windows, the installer produces a **static exe**, so no MSYS2 is required.
 * Netcat (`nc`) can be used to test TCP connections manually.
