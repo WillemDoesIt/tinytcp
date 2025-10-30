@@ -18,7 +18,7 @@
         buildInputs = [ pkgs.gcc ];
         buildPhase = ''
           mkdir -p $out/bin
-          $CXX main.cpp -std=c++17 -O2 -g -o $out/bin/tinytcp
+          $CXX $(find source -name '*.cpp') -Iheaders -std=c++17 -O2 -g -o $out/bin/tinytcp
         '';
       };
       devShell = pkgs.mkShell {
