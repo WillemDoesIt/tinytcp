@@ -22,7 +22,7 @@
         '';
       };
       devShell = pkgs.mkShell {
-        buildInputs = [ pkgs.gcc ];
+        buildInputs = with pkgs; [ gcc lazygit lldb];
       };
     };
   in
