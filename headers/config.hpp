@@ -3,12 +3,12 @@
 
 std::filesystem::path get_config_path() {
 #ifdef _WIN32
-    const char* appdata = std::getenv("APPDATA");
-    std::filesystem::path base = appdata ? appdata : ".";
+    const char* APPDATA = std::getenv("APPDATA");
+    std::filesystem::path base = APPDATA ? APPDATA : ".";
     base /= "tinytcp";
 #else
-    const char* home = std::getenv("HOME");
-    std::filesystem::path base = home ? home : ".";
+    const char* HOME = std::getenv("HOME");
+    std::filesystem::path base = HOME ? HOME : ".";
     base /= ".config/tinytcp";
 #endif
     std::filesystem::create_directories(base);
@@ -38,8 +38,8 @@ Config load_config() {
         if (auto m = tbl["message"].value<std::string>()) {
             cfg.message = *m;
         }
-    } catch (const toml::parse_error& err) {
-        std::cerr << "Error parsing " << path << ": " << err.description() << "\n";
+    } catch (const toml::parse_error& ERR) {
+        std::cerr << "Error parsing " << path << ": " << ERR.description() << "\n";
     }
     return cfg;
 }

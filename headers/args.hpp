@@ -2,6 +2,8 @@
 
 #include <vector>
 
+const std::string VERSION = "v0.4.0-beta";
+
 struct Args {
     std::string mode;
     std::string host = "127.0.0.1";
@@ -14,21 +16,28 @@ struct Args {
 
 Args parse_args(int argc, char** argv) {
     Args args;
+
     if (argc < 2) { args.help = true; return args; }
 
-    args.mode = argv[1];
-    std::vector<std::string> tokens(argv + 2, argv + argc);
+    const std::string FIRST = argv[1];
 
-    for (size_t i = 0; i < tokens.size(); ++i) {
-        const std::string& t = tokens[i];
+    if (FIRST == "--help-verbose") { args.help_verbose = true; return args; }
+    if (FIRST == "-v" || FIRST == "--version") { args.version = true; return args; }
+    if (FIRST == "-h" || FIRST == "--help") { args.help = true; return args; }
+
+    args.mode = FIRST;
+    const std::vector<std::string> TOKENS(argv + 2, argv + argc);
+
+    for (size_t i = 0; i < TOKENS.size(); ++i) {
+        auto& t = TOKENS[i];
         if (t == "-h" || t == "--help") args.help = true;
         else if (t == "--help-verbose") args.help_verbose = true;
         else if (t == "-v" || t == "--version") args.version = true;
-        else if ((t == "-p" || t == "--port") && i + 1 < tokens.size())
-            args.port = std::stoi(tokens[++i]);
-        else if ((t == "-m" || t == "--message") && i + 1 < tokens.size())
-            args.message = tokens[++i];
-        else if (args.mode == "client" && args.host == "127.0.0.1" && t.find('-') != 0)
+        else if ((t == "-p" || t == "--port") && i + 1 < TOKENS.size())
+            args.port = std::stoi(TOKENS[++i]);
+        else if ((t == "-m" || t == "--message") && i + 1 < TOKENS.size())
+            args.message = TOKENS[++i];
+        else if (args.mode == "client" && args.host == "127.0.0.1" && t[0] != '-')
             args.host = t;
         else
             throw std::runtime_error("Unknown or misplaced argument: " + t);
@@ -36,8 +45,8 @@ Args parse_args(int argc, char** argv) {
     return args;
 }
 
-void print_help(const Args& a) {
-    if (a.help_verbose) {
+void print_help(const Args& A) {
+    if (A.help_verbose) {
         std::cout << R"(
 tinytcp — a minimal cross-platform TCP testing tool
 
@@ -78,16 +87,16 @@ Examples:
   tinytcp client 127.0.0.1 --port 50001 --message "test"
 
 Notes:
-  • tinytcp reads its config once at startup — changes mid-run have no effect.
+  • tinytcp reads its config once at startup. No changes mid-run have any effect.
   • communication will stall if the server device has a firewall blocking the TCP port, which is common on many operating systems. You may have to manually enable ports or disable the firewall, be careful when doing so.
 
 Version:
-  tinytcp v0.0.1-beta
+  tinytcp v0.4.0-beta
         )";
         return;
     }
 
-    if (a.mode.empty()) {
+    if (A.mode.empty()) {
         std::cout <<
             "tinytcp [mode] [args]\n"
             "  Modes:\n"
@@ -97,27 +106,29 @@ Version:
             "    -h, --help            Show help\n"
             "    --help-verbose        Detailed manual\n"
             "    -v, --version         Show version\n"
-            "  Config file: " << get_config_path() << "\n\n";
+            "  Config file: " << get_config_path() << "\n";
         return;
     }
 
-    if (a.mode == "server") {
+    if (A.mode == "server") {
         std::cout <<
             "tinytcp server [options]\n"
             "  -p, --port <port>     Port to listen on (default from config)\n"
-            "  -h, --help            Show this help\n\n";
+            "  -h, --help            Show this help\n";
         return;
     }
 
-    if (a.mode == "client") {
+    if (A.mode == "client") {
         std::cout <<
             "tinytcp client [host] [options]\n"
             "  -m, --message <msg>   Message to send (default from config)\n"
             "  -p, --port <port>     Port (default from config)\n"
-            "  -h, --help            Show this help\n\n";
+            "  -h, --help            Show this help\n";
         return;
     }
 }
 
-
+void print_version() {
+    std::cout << "tinytcp " << VERSION << "\n";
+}
 

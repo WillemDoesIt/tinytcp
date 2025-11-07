@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
 // 
-// tcp.hpp v0.0.0-beta
+// tcp.hpp v0.4.0-beta
 // https://github.com/WillemDoesIt/tinytcp
 // SPDX-License-Identifier: Unlicense
 //
@@ -113,31 +113,36 @@
  * cleanup_sockets();
  */
 static std::string get_local_ipv4() {
-    SOCKET sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sock < 0) return "unknown";
+    const SOCKET SOCK = socket(AF_INET, SOCK_DGRAM, 0);
+    if (SOCK < 0) return "unknown";
 
     sockaddr_in serv{};
     serv.sin_family = AF_INET;
-    serv.sin_port = htons(53); // DNS port; no packets sent
+    serv.sin_port = htons(53);
     inet_pton(AF_INET, "8.8.8.8", &serv.sin_addr);
 
-    if (connect(sock, (sockaddr*)&serv, sizeof(serv)) < 0) {
-        CLOSESOCKET(sock);
+    if (connect(SOCK, reinterpret_cast<const sockaddr*>(&serv),
+                sizeof(serv)) < 0) {
+        CLOSESOCKET(SOCK);
         return "unknown";
     }
 
     sockaddr_in name{};
     socklen_t namelen = sizeof(name);
-    if (getsockname(sock, (sockaddr*)&name, &namelen) < 0) {
-        CLOSESOCKET(sock);
+
+    if (getsockname(SOCK, reinterpret_cast<sockaddr*>(&name),
+                    &namelen) < 0) {
+        CLOSESOCKET(SOCK);
         return "unknown";
     }
 
     char buf[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &name.sin_addr, buf, sizeof(buf));
-    CLOSESOCKET(sock);
+
+    CLOSESOCKET(SOCK);
     return std::string(buf);
 }
+
 
 /**
  * @brief Runs a simple TCP server on the specified port.

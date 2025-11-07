@@ -13,7 +13,7 @@
     makePackage = pkgs: {
       tinytcp = pkgs.stdenv.mkDerivation {
         pname = "tinytcp";
-        version = "v0.0.1-beta";
+        version = "v0.4.0-beta";
         src = ./.;
         buildInputs = [ pkgs.gcc ];
         buildPhase = ''

@@ -1,5 +1,5 @@
 # TinyTCP
-Version: 0.0.1-alpha
+Version: 0.4.0-beta
 
 > [!WARNING]
 > This project is in early stages. Functionality is available, but use at your own risk.  
@@ -24,7 +24,11 @@ tinytcp client <host>
 
 ---
 
-### Option 2 — MSYS2 + MinGW64 (Dev / Testing)
+### Option 2 — Manual build (Dev / Testing)
+
+There is a `run.bat` file that you can execute to automatically compile and run the generated executable if you have the C++ compiler installed. 
+
+I have found C++ and Windows doesn't often work nicely together, if this doesn't work here is how I got it running on Windows.
 
 1. **Install MSYS2 via winget:**
 
@@ -49,14 +53,14 @@ cd /c/Users/<you>/path/to/tinytcp
 ./run.bat --help
 ```
 > [!NOTE]
-> Replace path/to/tinytcp
+> Replace <you>/path/to/tinytcp
 > `pwd` shows current path, and `whoami` shows current user
 
 5. Optional debugging with Netcat:
 
 ```cmd
 winget install Insecure.Nmap
-"C:\Program Files (x86)\Nmap\nc.exe" localhost 49153
+"C:\Program Files (x86)\Nmap\nc.exe" localhost 50001
 ```
 
 6. Optional compiling your own installer:
@@ -75,7 +79,11 @@ wix build ./create_installer.wxs -ext WixToolset.UI.wixext -o ./build/tinytcp_in
 1. Install Nix:
 
 ```bash
-sh <(curl -L https://nixos.org/nix/install) --no-daemon
+# Linux and WSL install
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
+
+# macOS install
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
 ```
 > [!NOTE]
 > Not necessary if already on NixOS
@@ -88,7 +96,7 @@ chmod +x run.sh         # one-time
 ./run.sh --help
 ```
 
-3. Build and install to your profile:
+3. Optional Build and install to your profile:
 
 ```bash
 nix build .#tinytcp
@@ -147,5 +155,15 @@ chmod +x run.sh          # one-time
 
 ## Using the Library
 
-The library is a header-only file stored wtih `./headers/` titled `tcp.hpp`. The file is so small that it is not worth seperating into a `.h` and `.cpp` to crate some `.so` binary of the library because it adds nearly no compile time. The `./examples/` as well as the documentation within the file should make it clear how to gets started.
+The library is a header-only file stored wtih `./headers/` titled `tcp.hpp`. The file is so small that it is not worth seperating into a `.h` and `.cpp` to crate some `.so` binary of the library because it adds nearly no compile time. The `./examples/` as well as the documentation within the file should make it clear how to use it.
 
+to compile the main.cpp in examples, run:
+```
+# macOS, Linux
+c++ -Iheaders $(find examples -name '*.cpp') -std=c++17 -O2 -g -o build/example
+./build/example
+
+# Windows
+c++ -Iheaders examples\\main.cpp -std=c++17 -O2 -g -static -static-libgcc -static-libstdc++ -o build\\example.exe -lws2_32
+build\\example.exe
+```
