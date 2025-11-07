@@ -14,7 +14,7 @@ Simple TCP listener/server program (and library). The program is used in command
 
 ### Option 1 — Installer (Recommended)
 
-1. Run the NSIS installer (`tinytcp-installer.msi`) included in the release.
+1. Run the NSIS installer (`tinytcp-installer.msi`) included in the [latest release](https://github.com/WillemDoesIt/tinytcp/releases).
 2. After installation, **open a new terminal** and run:
 
 ```cmd
