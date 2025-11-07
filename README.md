@@ -127,19 +127,19 @@ xcode-select --install
 
 ```bash
 sudo apt update
-sudo apt install g++ make
+sudo apt install g++
 ```
 
 **Fedora:**
 
 ```bash
-sudo dnf install gcc-c++ make
+sudo dnf install gcc-c++
 ```
 
 **Arch:**
 
 ```bash
-sudo pacman -S gcc make
+sudo pacman -S gcc
 ```
 
 2. Build and run:
