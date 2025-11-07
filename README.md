@@ -1,73 +1,169 @@
 # TinyTCP
-Version: 0.3.1-alpha
+Version: 0.4.0-beta
 
 > [!WARNING]
 > This project is in early stages. Functionality is available, but use at your own risk.  
 > A proper release branch will follow once fully tested.
 > Originally intended for a class this has become big enough that I will continue to work on it.
 
-TinyTCP is a lightweight, cross-platform TCP client/server utility.  
-It allows listening on a TCP port and sending/receiving messages on that port.  
+Simple TCP listener/server program (and library). The program is used in command line interface and is compilable on all major Operating Systems.
 
-# User Install
-This orginally instended to run on windows and linux is not (to my knowledge) compile-able on windows. The easiest install would be using NixOS or installing the nix package on a Linux distrobution with
+---
+
+## Windows Run (Installer or MSYS2 + MinGW64)
+
+### Option 1 — Installer (Recommended)
+
+1. Run the NSIS installer (`tinytcp-installer.msi`) included in the release.
+2. After installation, **open a new terminal** and run:
+
+```cmd
+tinytcp server
+tinytcp client <host>
+```
+
+---
+
+### Option 2 — Manual build (Dev / Testing)
+
+There is a `run.bat` file that you can execute to automatically compile and run the generated executable if you have the C++ compiler installed. 
+
+I have found C++ and Windows doesn't often work nicely together, if this doesn't work here is how I got it running on Windows.
+
+1. **Install MSYS2 via winget:**
+
+```cmd
+winget install -e --id MSYS2.MSYS2
+```
+
+2. Open the **MinGW64 shell** (`C:\msys64\mingw64.exe`).
+3. Update and install the compiler:
+
 ```bash
+pacman -Syu    # then close and reopen shell
+pacman -S mingw-w64-x86_64-gcc
+```
+> [!NOTE]
+> Despite pacman being the offical package manager for Arch Linux, this acutally runs in a Windows MSYS2 Shell
+
+4. Navigate to the project directory and run:
+
+```bash
+cd /c/Users/<you>/path/to/tinytcp
+./run.bat --help
+```
+> [!NOTE]
+> Replace <you>/path/to/tinytcp
+> `pwd` shows current path, and `whoami` shows current user
+
+5. Optional debugging with Netcat:
+
+```cmd
+winget install Insecure.Nmap
+"C:\Program Files (x86)\Nmap\nc.exe" localhost 50001
+```
+
+6. Optional compiling your own installer:
+
+```cmd
+winget install WiXToolset.WiXCLI 
+wix build ./create_installer.wxs -ext WixToolset.UI.wixext -o ./build/tinytcp_installer.msi
+```
+
+---
+
+## macOS / WSL / Linux
+
+### Option 1 — Nix (Recommended)
+
+1. Install Nix:
+
+```bash
+# Linux and WSL install
 sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon
-```
 
-Then download the repo and install manually.
-```bash
-# Clone repository at preferred directory
-git clone git@github.com:WillemDoesIt/tinytcp.git
-cd tinytcp
-
-
-# Option1: Build the package with nix
-nix build .#ttcp
-# Run directly
-./result/bin/ttcp --help
-
-# Optionally Install and uninstall commands (makes `ttcp` a command)
-nix profile install .#ttcp
-nix profile remove ttcp  # uninstall
-
-# Option2: Open a shell that auto installs the dependencies
-nix develop
-# Then run the program with
-./build.sh
-./bin/ttcp --help
-
-
-## Example Usage (if you did Option2 instead write `./bin/ttcp` in place of `ttcp`)
-
-# Start server, listening on default port
-ttcp server
-ttcp server --port 9001 # custom port 9001
-
-# From another terminal or host
-ttcp client 127.0.0.1 # send to self
-ttcp client 10.10.10.10 --message "Hello Server!" --port 9001 # send "Hello Server!" to 10.10.10.10:9001 
+# macOS install
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
 ```
 > [!NOTE]
-> If it stalls not seeming to send you may have the port you are trying to use blocked by default firewall settings. search online for the `networking.firewall.allowedTCPPorts` setting on nixos and after adjusting the `/etc/nixos/configuration.nix` file run `sudo nixos-rebuild switch` to have the setting go into effect a reboot may be necessary.
+> Not necessary if already on NixOS
 
-
-## Manual Build (Non-Nix)
+2. Enter a dev shell for fast iterative builds:
 
 ```bash
-# Clone in preferred dierectory
-git clone git@github.com:WillemDoesIt/tinytcp.git
-cd tinytcp
+nix develop             # once per session
+chmod +x run.sh         # one-time
+./run.sh --help
+```
 
-# Compile + run
-./deploy.sh
-./bin/ttcp --help
+3. Optional Build and install to your profile:
+
+```bash
+nix build .#tinytcp
+nix profile install .#tinytcp
+
+# Now you can run anywhere:
+tinytcp --help
+
+# To uninstall:
+nix profile remove tinytcp
+```
+
+---
+
+### Option 2 — Native Build (Non-Nix)
+
+This has not yet been requested to be hosted on any package managers, nor have an Appimage, so you instead must compile it yourself.
+
+1. Make sure you have a C++ compiler:
+
+**macOS:**
+
+```bash
+xcode-select --install
+```
+
+**Debian/Ubuntu:**
+
+```bash
+sudo apt update
+sudo apt install g++ make
+```
+
+**Fedora:**
+
+```bash
+sudo dnf install gcc-c++ make
+```
+
+**Arch:**
+
+```bash
+sudo pacman -S gcc make
+```
+
+2. Build and run:
+
+```bash
+chmod +x run.sh          # one-time
+./run.sh --help
 ```
 > [!NOTE]
-> Dependency is a C++ compiler (`clang++` or `g++`).
+> The compiled executable is placed in `build/` so `./build/tinytcp` is faster if pre-compiled
 
+---
 
+## Using the Library
 
-## Defaults
+The library is a header-only file stored wtih `./headers/` titled `tcp.hpp`. The file is so small that it is not worth seperating into a `.h` and `.cpp` to crate some `.so` binary of the library because it adds nearly no compile time. The `./examples/` as well as the documentation within the file should make it clear how to use it.
 
-By default the message will be "Hello from client" and the port number will be 50001, these can be found and adjusted in `./config/ttcp` which will be created upon the first time you run the binary.
+to compile the main.cpp in examples, run:
+```
+# macOS, Linux
+c++ -Iheaders $(find examples -name '*.cpp') -std=c++17 -O2 -g -o build/example
+./build/example
+
+# Windows
+c++ -Iheaders examples\\main.cpp -std=c++17 -O2 -g -static -static-libgcc -static-libstdc++ -o build\\example.exe -lws2_32
+build\\example.exe
+```

@@ -1,48 +1,35 @@
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-    miniCompileCommands = {
-      url = "github:danielbarter/mini_compile_commands/v0.6";
-      flake = false;
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs";
+
+  outputs = { self, nixpkgs }:
+
+  let
+    systems = {
+      x86_64-linux = nixpkgs.legacyPackages.x86_64-linux;
+      aarch64-linux = nixpkgs.legacyPackages.aarch64-linux;
+      x86_64-darwin = nixpkgs.legacyPackages.x86_64-darwin;
     };
-    koturNixPkgs = {
-      url = "github:nkoturovic/kotur-nixpkgs/v0.8.0";
-      flake = false;
+
+    makePackage = pkgs: {
+      tinytcp = pkgs.stdenv.mkDerivation {
+        pname = "tinytcp";
+        version = "v0.4.0-beta";
+        src = ./.;
+        buildInputs = [ pkgs.gcc ];
+        buildPhase = ''
+          mkdir -p $out/bin
+          $CXX -Iheaders $(find source -name '*.cpp') -std=c++17 -O2 -g -o $out/bin/tinytcp         
+        '';
+      };
+      devShell = pkgs.mkShell {
+        buildInputs = with pkgs; [ gcc lazygit lldb];
+      };
     };
+  in
+  {
+    packages = builtins.mapAttrs (arch: pkgs: makePackage pkgs) systems;
+    defaultPackage = builtins.mapAttrs (arch: pkgs: self.packages.${arch}.tinytcp) systems;
+    devShells = builtins.mapAttrs (arch: pkgs: { dev = self.packages.${arch}.devShell; }) systems;
   };
-
-  outputs = { self, nixpkgs, flake-utils, miniCompileCommands, koturNixPkgs, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        mcc = pkgs.callPackage miniCompileCommands {};
-        mcc-env = mcc.wrap pkgs.stdenv;
-        mcc-hook = mcc.hook;
-
-        package = mcc-env.mkDerivation (self: {
-          pname = "ttcp";
-          version = "0.3.1-alpha";
-          src = builtins.path {
-            path = ./.;
-            filter = path: type: !(pkgs.lib.hasPrefix "." (baseNameOf path));
-          };
-          nativeBuildInputs = with pkgs; [ mcc-hook ncurses cmake gnumake ];
-          buildInputs = with pkgs; [ fmt tomlplusplus catch2 ];
-          cmakeFlags = [ "--no-warn-unused-cli" ];
-          passthru = { inherit pkgs shell; };
-        });
-
-        shell = (pkgs.mkShell.override { stdenv = mcc-env; }) {
-          inputsFrom = [ package ];
-          shellHook = ''
-            echo -e "\033[0;32m[  OK  ]\033[0m Entered dev shell."
-          '';
-        };
-      in {
-        packages.ttcp = package;
-        devShells.default = shell;
-        formatter = pkgs.alejandra;
-      });
 }
 

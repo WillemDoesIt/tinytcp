@@ -1,0 +1,49 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Package Name="TinyTCP"
+           Manufacturer="Willem Van Zwol"
+           Version="0.0.1.0"
+           UpgradeCode="4ad257e9-4b67-434a-a625-4f1c17c94fba"
+           Scope="perMachine"
+           InstallerVersion="500">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of TinyTCP is already installed." />
+
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="TinyTCP">
+        <Component Id="TinyTCPExeComponent">
+          <File Source="build\tinytcp.exe" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="TinyTCPShortcutDir" Name="TinyTCP">
+        <Component Id="TinyTCPShortcutComponent">
+          <Shortcut Id="TinyTCPShortcut"
+                    Name="TinyTCP"
+                    Description="TinyTCP – TCP listener/client tool"
+                    Target="[INSTALLFOLDER]\tinytcp.exe"
+                    WorkingDirectory="INSTALLFOLDER" />
+          <RemoveFolder Id="RemoveTinyTCPShortcutDir" On="uninstall" />
+          <RegistryValue Root="HKCU" Key="Software\TinyTCP" Name="Installed" Value="1" Type="integer" KeyPath="yes"/>
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <ComponentGroup Id="ProductComponents">
+      <ComponentRef Id="TinyTCPExeComponent" />
+      <ComponentRef Id="TinyTCPShortcutComponent" />
+    </ComponentGroup>
+
+    <Feature Id="MainFeature" Title="TinyTCP" Level="1" Display="expand">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <Property Id="ARPPRODUCTICON" Value="tinytcp.exe" />
+    <Property Id="ARPINSTALLLOCATION" Value="INSTALLFOLDER" />
+
+  </Package>
+
+</Wix>
+

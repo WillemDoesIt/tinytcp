@@ -1,30 +1,32 @@
-#include <iostream>
-#include <thread>
-#include "config.hpp"
-#include "network.hpp"
-#include "cli.hpp"
+#include "toml.hpp"
+#include "tcp.hpp"
+#include "args.hpp"
 
-const std::string VERSION = "0.3.1-alpha";
-const std::string PKG = "ttcp";
+#include <iostream>
 
 int main(int argc, char** argv) {
-    cross_platform_socket::initialize();
-    Config cfg = load_config(PKG);
-    Args args = parse_args(argc, argv, cfg);
+    Args args;
+    try { args = parse_args(argc, argv); }
+    catch (const std::exception& e) { std::cerr << e.what() << "\n"; return 1; }
 
-    if (args.help) { print_help(); return 0; }
-    if (args.version) { std::cout << PKG + ": " + VERSION + "\n"; return 0; }
-
-    if (args.server) { start_server(args.port); while (true) std::this_thread::sleep_for(std::chrono::hours(24)); }
-    else {
-        if (args.server_ip.empty()) { 
-            std::cerr << "Client requires SERVER_IP argument\n"; 
-            return 1; 
-        }
-        send_message(args.server_ip, args.port, args.message);
+    if (args.help || args.help_verbose) {
+        print_help(args);
+        return 0;
+    } else if (args.version) {
+        print_version();
+        return 0;
     }
 
-    cross_platform_socket::cleanup();
-    return 0;
+    const Config CONFIG = load_config();
+    const int PORT = (args.port != -1) ? args.port : CONFIG.port;
+    const std::string MESSAGE = !args.message.empty() ? args.message : CONFIG.message;
+
+    init_sockets();
+
+    if (args.mode == "server") run_server(PORT);
+    else if (args.mode == "client") run_client(args.host, PORT, MESSAGE);
+    else { std::cerr << "Unknown mode: " << args.mode << "\n"; return 1; }
+
+    cleanup_sockets();
 }
 

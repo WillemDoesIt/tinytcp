@@ -1,28 +1,45 @@
-#pragma once
-#include <string>
-#include <toml++/toml.h>
+#include <fstream>
+#include <filesystem>
 
-/**
- * @brief Holds configuration values loaded from a TOML file.
- * 
- * Fields are populated from the user's configuration file if it exists,
- * or from defaults if the file is missing.
- */
+std::filesystem::path get_config_path() {
+#ifdef _WIN32
+    const char* APPDATA = std::getenv("APPDATA");
+    std::filesystem::path base = APPDATA ? APPDATA : ".";
+    base /= "tinytcp";
+#else
+    const char* HOME = std::getenv("HOME");
+    std::filesystem::path base = HOME ? HOME : ".";
+    base /= ".config/tinytcp";
+#endif
+    std::filesystem::create_directories(base);
+    return base / "config.toml";
+}
+
 struct Config {
-    int port;              ///< Default port (default: 50001)
-    std::string message;   ///< Default message (default: "Hello from client")
+    int port = 49153;
+    std::string message = "Hello from client!";
 };
 
-/**
- * @brief Loads configuration from the standard platform-specific config path.
- * 
- * On Linux/macOS, the path is ~/.config/{pkgname}/config.toml.
- * On Windows, the path is %APPDATA%\{pkgname}\config.toml.
- * 
- * If the file does not exist, a new one is created with default values.
- * 
- * @param pkgname Name of the package/application, used to determine config path.
- * @return Config Populated configuration values.
- */
-Config load_config(const std::string& pkgname);
+Config load_config() {
+    Config cfg;
+    auto path = get_config_path();
 
+    if (!std::filesystem::exists(path)) {
+        std::ofstream out(path);
+        out << "port = " << cfg.port << "\nmessage = \"" << cfg.message <<"\"\n";
+        std::cout << "Created default config at " << path << "\n";
+        return cfg;
+    }
+    try {
+        auto tbl = toml::parse_file(path.string());
+        if (auto p = tbl["port"].value<int>()) { 
+            cfg.port = *p;
+        }
+        if (auto m = tbl["message"].value<std::string>()) {
+            cfg.message = *m;
+        }
+    } catch (const toml::parse_error& ERR) {
+        std::cerr << "Error parsing " << path << ": " << ERR.description() << "\n";
+    }
+    return cfg;
+}
