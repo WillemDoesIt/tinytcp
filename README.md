@@ -6,7 +6,7 @@ Version: 0.0.1-alpha
 > A proper release branch will follow once fully tested.
 > Originally intended for a class this has become big enough that I will continue to work on it.
 
-Simple TCP listener/server program. Supports sending a message between client and server.
+Simple TCP listener/server program (and library). The program is used in command line interface and is compilable on all major Operating Systems.
 
 ---
 
@@ -142,4 +142,10 @@ chmod +x run.sh          # one-time
 ```
 > [!NOTE]
 > The compiled executable is placed in `build/` so `./build/tinytcp` is faster if pre-compiled
+
+---
+
+## Using the Library
+
+The library is a header-only file stored wtih `./headers/` titled `tcp.hpp`. The file is so small that it is not worth seperating into a `.h` and `.cpp` to crate some `.so` binary of the library because it adds nearly no compile time. The `./examples/` as well as the documentation within the file should make it clear how to gets started.
 
