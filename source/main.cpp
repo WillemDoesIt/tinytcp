@@ -11,6 +11,7 @@
 #else
   #include <arpa/inet.h>
   #include <unistd.h>
+  #include <netdb.h>
   #define SOCKET int
   #define CLOSESOCKET close
   void init_sockets() {}
@@ -24,11 +25,6 @@
 #include <map>
 #include <vector>
 #include <cstring>
-
-struct Config {
-    int port = 49153;
-    std::string message = "Hello from client!";
-};
 
 std::filesystem::path get_config_path() {
 #ifdef _WIN32
@@ -44,19 +40,29 @@ std::filesystem::path get_config_path() {
     return base / "config.toml";
 }
 
+struct Config {
+    int port = 49153;
+    std::string message = "Hello from client!";
+};
+
 Config load_config() {
     Config cfg;
     auto path = get_config_path();
+
     if (!std::filesystem::exists(path)) {
         std::ofstream out(path);
-        out << "port = 49153\nmessage = \"Hello from client!\"\n";
+        out << "port = " << cfg.port << "\nmessage = \"" << cfg.message <<"\"\n";
         std::cout << "Created default config at " << path << "\n";
         return cfg;
     }
     try {
         auto tbl = toml::parse_file(path.string());
-        if (auto p = tbl["port"].value<int>()) cfg.port = *p;
-        if (auto m = tbl["message"].value<std::string>()) cfg.message = *m;
+        if (auto p = tbl["port"].value<int>()) { 
+            cfg.port = *p;
+        }
+        if (auto m = tbl["message"].value<std::string>()) {
+            cfg.message = *m;
+        }
     } catch (const toml::parse_error& err) {
         std::cerr << "Error parsing " << path << ": " << err.description() << "\n";
     }
@@ -112,12 +118,11 @@ Server usage:
 Examples:
   tinytcp server
   tinytcp client 127.0.0.1
-  tinytcp client 127.0.0.1 --port 40000 --message "test"
+  tinytcp client 127.0.0.1 --port 50001 --message "test"
 
 Notes:
   • tinytcp reads its config once at startup — changes mid-run have no effect.
-  • Works on Windows, macOS, and Linux.
-  • No dependencies beyond the C++ standard library and toml.hpp.
+  • communication will stall if the server device has a firewall blocking the TCP port, which is common on many operating systems. You may have to manually enable ports or disable the firewall, be careful when doing so.
 
 Version:
   tinytcp v0.0.1-beta
@@ -135,7 +140,7 @@ Version:
             "    -h, --help            Show help\n"
             "    --help-verbose        Detailed manual\n"
             "    -v, --version         Show version\n"
-            "  Config file: " << get_config_path() << "\n";
+            "  Config file: " << get_config_path() << "\n\n";
         return;
     }
 
@@ -143,8 +148,7 @@ Version:
         std::cout <<
             "tinytcp server [options]\n"
             "  -p, --port <port>     Port to listen on (default from config)\n"
-            "  -h, --help            Show this help\n"
-            "  Config file: " << get_config_path() << "\n";
+            "  -h, --help            Show this help\n\n";
         return;
     }
 
@@ -153,8 +157,7 @@ Version:
             "tinytcp client [host] [options]\n"
             "  -m, --message <msg>   Message to send (default from config)\n"
             "  -p, --port <port>     Port (default from config)\n"
-            "  -h, --help            Show this help\n"
-            "  Config file: " << get_config_path() << "\n";
+            "  -h, --help            Show this help\n\n";
         return;
     }
 }
@@ -183,6 +186,33 @@ Args parse_args(int argc, char** argv) {
     return args;
 }
 
+std::string get_local_ipv4() {
+    SOCKET sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) return "unknown";
+
+    sockaddr_in serv{};
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(53); // DNS port, doesn't actually send
+    inet_pton(AF_INET, "8.8.8.8", &serv.sin_addr);
+
+    if (connect(sock, (sockaddr*)&serv, sizeof(serv)) < 0) {
+        CLOSESOCKET(sock);
+        return "unknown";
+    }
+
+    sockaddr_in name{};
+    socklen_t namelen = sizeof(name);
+    if (getsockname(sock, (sockaddr*)&name, &namelen) < 0) {
+        CLOSESOCKET(sock);
+        return "unknown";
+    }
+
+    char buf[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &name.sin_addr, buf, sizeof(buf));
+    CLOSESOCKET(sock);
+    return std::string(buf);
+}
+
 void run_server(int port) {
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
     sockaddr_in addr{};
@@ -191,7 +221,7 @@ void run_server(int port) {
     addr.sin_port = htons(port);
     bind(sock, (sockaddr*)&addr, sizeof(addr));
     listen(sock, 1);
-    std::cout << "Server listening on port " << port << "...\n";
+    std::cout << "Server listening " << get_local_ipv4() << ":" << port << "...\n";
 
     SOCKET client = accept(sock, nullptr, nullptr);
     char buf[1024]{};
@@ -200,6 +230,7 @@ void run_server(int port) {
     CLOSESOCKET(client);
     CLOSESOCKET(sock);
 }
+
 
 void run_client(const std::string& host, int port, const std::string& msg) {
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
