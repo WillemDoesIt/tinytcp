@@ -2,7 +2,7 @@
 
   <Package Name="TinyTCP"
            Manufacturer="Willem Van Zwol"
-           Version="0.0.1.0"
+           Version="0.0.4.0"
            UpgradeCode="4ad257e9-4b67-434a-a625-4f1c17c94fba"
            Scope="perMachine"
            InstallerVersion="500">
