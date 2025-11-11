@@ -74,6 +74,9 @@ Client usage:
     -m, --message <text>   Message to send (overrides config)
     -p, --port <port>      Port to connect to
     -h, --help             Show help for client
+  Note:
+    You can send text files.
+    You can send messages with multiple words by adding quotes.
 
 Server usage:
   tinytcp server [options]
@@ -84,7 +87,8 @@ Server usage:
 Examples:
   tinytcp server
   tinytcp client 127.0.0.1
-  tinytcp client 127.0.0.1 --port 50001 --message "test"
+  tinytcp client 127.0.0.1 --port 50001 --message "Hello there server :D"
+  tinytcp client 127.0.0.1 --message example.txt
 
 Notes:
   • tinytcp reads its config once at startup. No changes mid-run have any effect.

@@ -3,6 +3,15 @@
 #include "args.hpp"
 
 #include <iostream>
+#include <filesystem>
+#include <fstream>
+
+std::string read_file(const std::string& path) {
+    std::ifstream f(path, std::ios::binary);
+    if (!f) throw std::runtime_error("cannot open file: " + path);
+    return { std::istreambuf_iterator<char>(f), {} };
+}
+
 
 int main(int argc, char** argv) {
     Args args;
@@ -19,7 +28,16 @@ int main(int argc, char** argv) {
 
     const Config CONFIG = load_config();
     const int PORT = (args.port != -1) ? args.port : CONFIG.port;
-    const std::string MESSAGE = !args.message.empty() ? args.message : CONFIG.message;
+
+    std::string MESSAGE;
+    if (!args.message.empty()) {
+        if (std::filesystem::exists(args.message))
+            MESSAGE = read_file(args.message);
+        else
+            MESSAGE = args.message;
+    } else {
+        MESSAGE = CONFIG.message;
+    }
 
     init_sockets();
 

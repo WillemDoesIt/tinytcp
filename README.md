@@ -20,6 +20,8 @@ Simple TCP listener/server program (and library). The program is used in command
 ```cmd
 tinytcp server
 tinytcp client <host>
+
+tintycp client 10.xx.xx.xx --port 50001 --message example.txt
 ```
 
 ---
